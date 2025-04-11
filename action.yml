@@ -1,23 +1,18 @@
-name: The name of your action here
-description: Provide a description here
-author: Your name or organization here
+name: Aderyn
+description: Perform smart contract static analysis checks.
+author: Cyfrin
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: heart
-  color: red
+  icon: code
+  color: blue
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: Your input description here
-    required: true
-    default: '1000'
-
-# Define your outputs here.
-outputs:
-  time:
-    description: Your output description here
+  fail-on:
+    description: Fails when issues are detected. Choose from low,high,both
+    required: false
+    default: 'high'
 
 runs:
   using: node20
