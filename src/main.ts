@@ -1,8 +1,13 @@
 import * as core from '@actions/core'
-import { FailOn, validateFailOn } from './config.js'
-import { installAderyn0_5 } from './install.js'
-import { runAderyn0_5 } from './run.js'
+import * as exec from '@actions/exec'
+import * as fs from 'fs'
 import { rmRF } from '@actions/io'
+
+enum FailOn {
+  High = 'high',
+  Low = 'low',
+  Both = 'both'
+}
 
 /**
  * The main function for the action.
@@ -14,12 +19,16 @@ export async function run(): Promise<void> {
     const failOn: string = core.getInput('fail-on')
 
     // Validate input
-    if (!validateFailOn(failOn)) {
+    if (
+      failOn !== FailOn.Low &&
+      failOn !== FailOn.Both &&
+      failOn !== FailOn.High
+    ) {
       throw new Error(`${failOn} must be one of "low", "high", "both"`)
     }
 
     // Install the aderyn tool
-    await installAderyn0_5()
+    await exec.exec('npm install -g @cyfrin/aderyn@0.5')
 
     // Run aderyn on the repository
     const { high, low, data: markdown } = await runAderyn0_5()
@@ -49,5 +58,21 @@ export async function run(): Promise<void> {
     // Cleanup reports before next CI step
     await rmRF('aderyn-report.json')
     await rmRF('aderyn-report.md')
+  }
+}
+
+async function runAderyn0_5() {
+  // Create reports
+  await exec.exec('aderyn  -o aderyn-report.json')
+  const data = fs.readFileSync('aderyn-report.json', 'utf8')
+  const parsed = JSON.parse(data)
+
+  await exec.exec('aderyn -o aderyn-report.md')
+  const markdown = fs.readFileSync('aderyn-report.md', 'utf8')
+
+  return {
+    high: parsed['issue_count']['high'],
+    low: parsed['issue_count']['low'],
+    data: markdown.toString()
   }
 }

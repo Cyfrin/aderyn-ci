@@ -27247,38 +27247,16 @@ function requireCore () {
 
 var coreExports = requireCore();
 
+var execExports = requireExec();
+
+var ioExports = requireIo();
+
 var FailOn;
 (function (FailOn) {
     FailOn["High"] = "high";
     FailOn["Low"] = "low";
     FailOn["Both"] = "both";
 })(FailOn || (FailOn = {}));
-function validateFailOn(arg) {
-    return arg === FailOn.Low || arg === FailOn.Both || arg === FailOn.High;
-}
-
-var execExports = requireExec();
-
-async function installAderyn0_5() {
-    await execExports.exec('npm install -g @cyfrin/aderyn@0.5');
-}
-
-async function runAderyn0_5() {
-    // Create reports
-    await execExports.exec('aderyn  -o aderyn-report.json');
-    const data = require$$1.readFileSync('aderyn-report.json', 'utf8');
-    const parsed = JSON.parse(data);
-    await execExports.exec('aderyn -o aderyn-report.md');
-    const markdown = require$$1.readFileSync('aderyn-report.md', 'utf8');
-    return {
-        high: parsed['issue_count']['high'],
-        low: parsed['issue_count']['low'],
-        data: markdown.toString()
-    };
-}
-
-var ioExports = requireIo();
-
 /**
  * The main function for the action.
  *
@@ -27288,11 +27266,13 @@ async function run() {
     try {
         const failOn = coreExports.getInput('fail-on');
         // Validate input
-        if (!validateFailOn(failOn)) {
+        if (failOn !== FailOn.Low &&
+            failOn !== FailOn.Both &&
+            failOn !== FailOn.High) {
             throw new Error(`${failOn} must be one of "low", "high", "both"`);
         }
         // Install the aderyn tool
-        await installAderyn0_5();
+        await execExports.exec('npm install -g @cyfrin/aderyn@0.5');
         // Run aderyn on the repository
         const { high, low, data: markdown } = await runAderyn0_5();
         coreExports.info(markdown);
@@ -27324,6 +27304,19 @@ async function run() {
         await ioExports.rmRF('aderyn-report.json');
         await ioExports.rmRF('aderyn-report.md');
     }
+}
+async function runAderyn0_5() {
+    // Create reports
+    await execExports.exec('aderyn  -o aderyn-report.json');
+    const data = require$$1.readFileSync('aderyn-report.json', 'utf8');
+    const parsed = JSON.parse(data);
+    await execExports.exec('aderyn -o aderyn-report.md');
+    const markdown = require$$1.readFileSync('aderyn-report.md', 'utf8');
+    return {
+        high: parsed['issue_count']['high'],
+        low: parsed['issue_count']['low'],
+        data: markdown.toString()
+    };
 }
 
 /**
