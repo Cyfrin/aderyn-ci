@@ -1,6 +1,7 @@
 import require$$0 from 'os';
 import require$$0$1 from 'crypto';
-import require$$1 from 'fs';
+import * as require$$1 from 'fs';
+import require$$1__default from 'fs';
 import require$$1$5 from 'path';
 import require$$2 from 'http';
 import require$$3 from 'https';
@@ -222,7 +223,7 @@ function requireFileCommand () {
 	// We use any as a valid input type
 	/* eslint-disable @typescript-eslint/no-explicit-any */
 	const crypto = __importStar(require$$0$1);
-	const fs = __importStar(require$$1);
+	const fs = __importStar(require$$1__default);
 	const os = __importStar(require$$0);
 	const utils_1 = requireUtils$1();
 	function issueFileCommand(command, message) {
@@ -25200,7 +25201,7 @@ function requireSummary () {
 		Object.defineProperty(exports, "__esModule", { value: true });
 		exports.summary = exports.markdownSummary = exports.SUMMARY_DOCS_URL = exports.SUMMARY_ENV_VAR = void 0;
 		const os_1 = require$$0;
-		const fs_1 = require$$1;
+		const fs_1 = require$$1__default;
 		const { access, appendFile, writeFile } = fs_1.promises;
 		exports.SUMMARY_ENV_VAR = 'GITHUB_STEP_SUMMARY';
 		exports.SUMMARY_DOCS_URL = 'https://docs.github.com/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary';
@@ -25592,7 +25593,7 @@ function requireIoUtil () {
 		var _a;
 		Object.defineProperty(exports, "__esModule", { value: true });
 		exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.READONLY = exports.UV_FS_O_EXLOCK = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rm = exports.rename = exports.readlink = exports.readdir = exports.open = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
-		const fs = __importStar(require$$1);
+		const fs = __importStar(require$$1__default);
 		const path = __importStar(require$$1$5);
 		_a = fs.promises
 		// export const {open} = 'fs'
@@ -27246,19 +27247,37 @@ function requireCore () {
 
 var coreExports = requireCore();
 
-/**
- * Waits for a number of milliseconds.
- *
- * @param milliseconds The number of milliseconds to wait.
- * @returns Resolves with 'done!' after the wait is over.
- */
-async function wait(milliseconds) {
-    return new Promise((resolve) => {
-        if (isNaN(milliseconds))
-            throw new Error('milliseconds is not a number');
-        setTimeout(() => resolve('done!'), milliseconds);
-    });
+var FailOn;
+(function (FailOn) {
+    FailOn["High"] = "high";
+    FailOn["Low"] = "low";
+    FailOn["Both"] = "both";
+})(FailOn || (FailOn = {}));
+function validateFailOn(arg) {
+    return arg === FailOn.Low || arg === FailOn.Both || arg === FailOn.High;
 }
+
+var execExports = requireExec();
+
+async function installAderyn0_5() {
+    await execExports.exec('npm install -g @cyfrin/aderyn@0.5');
+}
+
+async function runAderyn0_5() {
+    // Create reports
+    await execExports.exec('aderyn  -o aderyn-report.json');
+    const data = require$$1.readFileSync('aderyn-report.json', 'utf8');
+    const parsed = JSON.parse(data);
+    await execExports.exec('aderyn -o aderyn-report.md');
+    const markdown = require$$1.readFileSync('aderyn-report.md', 'utf8');
+    return {
+        high: parsed['issue_count']['high'],
+        low: parsed['issue_count']['low'],
+        data: markdown.toString()
+    };
+}
+
+var ioExports = requireIo();
 
 /**
  * The main function for the action.
@@ -27267,20 +27286,43 @@ async function wait(milliseconds) {
  */
 async function run() {
     try {
-        const ms = coreExports.getInput('milliseconds');
-        // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-        coreExports.debug(`Waiting ${ms} milliseconds ...`);
-        // Log the current timestamp, wait, then log the new timestamp
-        coreExports.debug(new Date().toTimeString());
-        await wait(parseInt(ms, 10));
-        coreExports.debug(new Date().toTimeString());
-        // Set outputs for other workflow steps to use
-        coreExports.setOutput('time', new Date().toTimeString());
+        const failOn = coreExports.getInput('fail-on');
+        // Validate input
+        if (!validateFailOn(failOn)) {
+            throw new Error(`${failOn} must be one of "low", "high", "both"`);
+        }
+        // Install the aderyn tool
+        await installAderyn0_5();
+        // Run aderyn on the repository
+        const { high, low, data: markdown } = await runAderyn0_5();
+        coreExports.info(markdown);
+        switch (failOn) {
+            case FailOn.Both:
+                if (high != '0' || low != '0') {
+                    throw new Error('High and low issues caught!');
+                }
+                break;
+            case FailOn.Low:
+                if (low != '0') {
+                    throw new Error('low issues caught!');
+                }
+                break;
+            case FailOn.High:
+                if (high != '0') {
+                    throw new Error('High issues caught!');
+                }
+                break;
+        }
     }
     catch (error) {
         // Fail the workflow run if an error occurs
         if (error instanceof Error)
             coreExports.setFailed(error.message);
+    }
+    finally {
+        // Cleanup reports before next CI step
+        await ioExports.rmRF('aderyn-report.json');
+        await ioExports.rmRF('aderyn-report.md');
     }
 }
 
