@@ -27330,8 +27330,7 @@ async function actOnReportForGivenInput(input, report) {
     coreExports.debug('Markdown report by running aderyn');
     coreExports.debug(report.mdContent);
     const createMessage = (category) => {
-        let message = `\n\n${category} issues found. Install and run aderyn locally to see more\n\n`;
-        message += `To install and use Aderyn locally, use either of the methods enlisted:\n`;
+        let message = `\n\n${category} issues found. Install and run aderyn locally to see more\n`;
         message += `1. VSCode extension - https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn\n`;
         message += `2. CLI - https://github.com/Cyfrin\n\n`;
         message += `Take any of the following action:\n`;
