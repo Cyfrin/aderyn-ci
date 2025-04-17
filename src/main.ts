@@ -117,7 +117,7 @@ async function actOnReportForGivenInput(input: Input, report: Report) {
   core.debug(report.mdContent)
 
   const createMessage = (category: string): string => {
-    let message = `\n\n${category} issues found. Install and run aderyn locally to see more\n`
+    let message = `${category} issues found. Install and run aderyn locally to see more\n`
     message += `1. VSCode extension - https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn\n`
     message += `2. CLI - https://github.com/Cyfrin\n\n`
     message += `Take any of the following action:\n`
@@ -128,14 +128,17 @@ async function actOnReportForGivenInput(input: Input, report: Report) {
 
   if (failOn === Contstraints.High) {
     if (report.high !== 0) {
+      core.info('\n\n')
       core.setFailed(createMessage('High'))
     }
   } else if (failOn === Contstraints.Any) {
     if (report.high !== 0 || report.low !== 0) {
+      core.info('\n\n')
       core.setFailed(createMessage('Some'))
     }
   } else if (warnOn === Contstraints.High) {
     if (report.high !== 0) {
+      core.info('\n\n')
       core.warning(createMessage('High'))
     }
   } else if (warnOn === Contstraints.Any) {
