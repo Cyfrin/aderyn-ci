@@ -10,9 +10,12 @@ branding:
 # Define your inputs here.
 inputs:
   fail-on:
-    description: Fails when issues are detected. Choose from low,high,both
+    description: values can be - high, all
     required: false
-    default: 'high'
+
+  warn-on:
+    description: values can be - high, all
+    requried: false
 
 runs:
   using: node20

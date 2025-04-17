@@ -3,76 +3,132 @@ import * as exec from '@actions/exec'
 import * as fs from 'fs'
 import { rmRF } from '@actions/io'
 
-enum FailOn {
-  High = 'high',
-  Low = 'low',
-  Both = 'both'
-}
-
-/**
- * The main function for the action.
- *
- * @returns Resolves when the action is complete.
- */
 export async function run(): Promise<void> {
   try {
+    // Gather Input
     const failOn: string = core.getInput('fail-on')
+    const warnOn: string = core.getInput('warn-on')
+    const input: Input = { failOn, warnOn }
 
-    // Validate input
-    if (
-      failOn !== FailOn.Low &&
-      failOn !== FailOn.Both &&
-      failOn !== FailOn.High
-    ) {
-      throw new Error(`${failOn} must be one of "low", "high", "both"`)
-    }
+    // Step 1: Validate input
+    ensureInputConstraints(input)
 
-    // Install the aderyn tool
-    await exec.exec('npm install -g @cyfrin/aderyn@0.5')
+    // Step 2: Install Aderyn
+    await installAderyn()
 
-    // Run aderyn on the repository
-    const { high, low, data: markdown } = await runAderyn0_5()
-    core.info(markdown)
+    // Step 3: Run aderyn on the repository
+    const report = await getReport()
 
-    switch (failOn) {
-      case FailOn.Both:
-        if (high != '0' || low != '0') {
-          throw new Error('High and low issues caught!')
-        }
-        break
-      case FailOn.Low:
-        if (low != '0') {
-          throw new Error('low issues caught!')
-        }
-        break
-      case FailOn.High:
-        if (high != '0') {
-          throw new Error('High issues caught!')
-        }
-        break
-    }
+    // Step 4: Act on report
+    await actOnReportForGivenInput(input, report)
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)
-  } finally {
-    // Cleanup reports before next CI step
-    await rmRF('aderyn-report.json')
-    await rmRF('aderyn-report.md')
   }
 }
 
-async function runAderyn0_5() {
-  // Create reports
-  await exec.exec('aderyn  -o aderyn-report.json')
-  const data = fs.readFileSync('aderyn-report.json', 'utf8')
-  const parsed = JSON.parse(data)
+// Types
+enum Contstraints {
+  High = 'high',
+  Any = 'any',
+  Undefined = ''
+}
 
-  await exec.exec('aderyn -o aderyn-report.md')
-  const markdown = fs.readFileSync('aderyn-report.md', 'utf8')
+interface Report {
+  high: Number
+  low: Number
+  mdContent: string
+}
 
-  return {
-    high: parsed['issue_count']['high'],
-    low: parsed['issue_count']['low'],
-    data: markdown.toString()
+interface Input {
+  failOn: string
+  warnOn: string
+}
+
+// Step 1
+function ensureInputConstraints(input: Input) {
+  const { failOn, warnOn } = input
+
+  if (failOn === Contstraints.Undefined && warnOn === Contstraints.Undefined) {
+    throw new Error(
+      'Received no input for action. Expected one of "fail-on", "warn-on"'
+    )
+  }
+
+  const passesConstraintsCheck = (argument: string): boolean => {
+    return (
+      argument === Contstraints.Undefined ||
+      argument === Contstraints.Any ||
+      argument === Contstraints.High
+    )
+  }
+  if (!passesConstraintsCheck(failOn)) {
+    throw new Error(`given fail-on: ${failOn}. Expected one of "high", "any"`)
+  }
+  if (!passesConstraintsCheck(warnOn)) {
+    throw new Error(`given warn-on: ${warnOn}. Expected one of "high", "any"`)
+  }
+}
+
+// Step 2
+async function installAderyn() {
+  await exec.exec('npm install -g @cyfrin/aderyn@0.5') // Max verison allowed for v0 is going to be 0.5.X aderyn
+}
+
+// Step 3
+async function getReport(): Promise<Report> {
+  const r = Math.round(Math.random() * 100000).toString()
+  const mdReportName = `aderyn-report-${r}.md`
+  const jsonReportName = `aderyn-report-${r}.json`
+
+  await exec.exec(`aderyn -o ${mdReportName}`)
+  await exec.exec(`aderyn -o ${jsonReportName}`)
+
+  const parsed = JSON.parse(fs.readFileSync(jsonReportName, 'utf8'))
+  const markdown = fs.readFileSync(mdReportName, 'utf8')
+
+  const report = {
+    high: parseInt(parsed['issue_count']['high']),
+    low: parseInt(parsed['issue_count']['low']),
+    mdContent: markdown.toString()
+  }
+
+  await rmRF(mdReportName)
+  await rmRF(jsonReportName)
+
+  return report
+}
+
+// Step 4
+async function actOnReportForGivenInput(input: Input, report: Report) {
+  const { failOn, warnOn } = input
+
+  core.debug('Markdown report by running aderyn')
+  core.debug(report.mdContent)
+
+  const createMessage = (category: string): string => {
+    let message = `${category} issues found. To see the issues, run "aderyn" in the workspace root of the project.\n`
+    message += `Take any of the following action:\n`
+    message += `1. Fix the issue reported\n`
+    message += `2. Nudge Aderyn to ignore these issues. Instructions at https://cyfrin.gitbook.io/cyfrin-docs/directives-to-ignore-specific-lines\n`
+    return message
+  }
+
+  if (failOn === Contstraints.High) {
+    if (report.high !== 0) {
+      core.setFailed(createMessage('High'))
+    }
+  } else if (failOn === Contstraints.Any) {
+    if (report.high !== 0 || report.low !== 0) {
+      core.setFailed(createMessage('Some'))
+    }
+  } else if (warnOn === Contstraints.High) {
+    if (report.high !== 0) {
+      core.warning(createMessage('High'))
+    }
+  } else if (warnOn === Contstraints.Any) {
+    if (report.high !== 0 || report.low !== 0) {
+      core.warning(createMessage('Some'))
+    }
   }
 }
