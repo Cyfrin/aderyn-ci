@@ -17,6 +17,10 @@ inputs:
     description: values can be - high, all
     requried: false
 
+  working-directory:
+    description: Path relative to the root.
+    required: false
+
 runs:
   using: node20
   main: dist/index.js

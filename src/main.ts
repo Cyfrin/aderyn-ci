@@ -8,7 +8,8 @@ export async function run(): Promise<void> {
     // Gather Input
     const failOn: string = core.getInput('fail-on')
     const warnOn: string = core.getInput('warn-on')
-    const input: Input = { failOn, warnOn }
+    const workDir: string = core.getInput('working-directory')
+    const input: Input = { failOn, warnOn, workDir }
 
     // Step 1: Validate input
     ensureInputConstraints(input)
@@ -17,7 +18,7 @@ export async function run(): Promise<void> {
     await installAderyn()
 
     // Step 3: Run aderyn on the repository
-    const report = await getReport()
+    const report = await getReport(workDir)
 
     // Step 4: Act on report
     await actOnReportForGivenInput(input, report)
@@ -43,11 +44,18 @@ interface Report {
 interface Input {
   failOn: string
   warnOn: string
+  workDir: string
 }
 
 // Step 1
 function ensureInputConstraints(input: Input) {
-  const { failOn, warnOn } = input
+  const { failOn, warnOn, workDir } = input
+
+  if (workDir !== Contstraints.Undefined) {
+    core.warning(
+      'Do not use `working-directory`. Please use `aderyn.toml` instead. Read here to find how - https://cyfrin.gitbook.io/cyfrin-docs/aderyn-vs-code/aderyn.toml-configuration'
+    )
+  }
 
   if (failOn === Contstraints.Undefined && warnOn === Contstraints.Undefined) {
     throw new Error(
@@ -76,13 +84,15 @@ async function installAderyn() {
 }
 
 // Step 3
-async function getReport(): Promise<Report> {
+async function getReport(rworkDir: string): Promise<Report> {
+  const cwd = rworkDir !== Contstraints.Undefined ? rworkDir : undefined
+
   const r = Math.round(Math.random() * 100000).toString()
   const mdReportName = `aderyn-report-${r}.md`
   const jsonReportName = `aderyn-report-${r}.json`
 
-  await exec.exec(`aderyn -o ${mdReportName}`)
-  await exec.exec(`aderyn -o ${jsonReportName}`)
+  await exec.exec(`aderyn -o ${mdReportName}`, [], { cwd })
+  await exec.exec(`aderyn -o ${jsonReportName}`, [], { cwd })
 
   const parsed = JSON.parse(fs.readFileSync(jsonReportName, 'utf8'))
   const markdown = fs.readFileSync(mdReportName, 'utf8')
