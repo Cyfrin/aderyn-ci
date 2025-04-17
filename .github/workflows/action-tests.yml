@@ -53,6 +53,7 @@ jobs:
         with:
           working-directory: ./test-contracts/hello_foundry
           fail-on: high
+          warn-on: low
 
   test-foundry-any-warn:
     name: Actions Test - Foundry-warn-Any

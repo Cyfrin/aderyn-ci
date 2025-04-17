@@ -10,11 +10,11 @@ branding:
 # Define your inputs here.
 inputs:
   fail-on:
-    description: values can be - high, all
+    description: values can be - high, low, any
     required: false
 
   warn-on:
-    description: values can be - high, all
+    description: values can be - high, low, any
     requried: false
 
   working-directory:
