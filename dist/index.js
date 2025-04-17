@@ -27256,13 +27256,14 @@ async function run() {
         // Gather Input
         const failOn = coreExports.getInput('fail-on');
         const warnOn = coreExports.getInput('warn-on');
-        const input = { failOn, warnOn };
+        const workDir = coreExports.getInput('working-directory');
+        const input = { failOn, warnOn, workDir };
         // Step 1: Validate input
         ensureInputConstraints(input);
         // Step 2: Install Aderyn
         await installAderyn();
         // Step 3: Run aderyn on the repository
-        const report = await getReport();
+        const report = await getReport(workDir);
         // Step 4: Act on report
         await actOnReportForGivenInput(input, report);
     }
@@ -27281,7 +27282,10 @@ var Contstraints;
 })(Contstraints || (Contstraints = {}));
 // Step 1
 function ensureInputConstraints(input) {
-    const { failOn, warnOn } = input;
+    const { failOn, warnOn, workDir } = input;
+    if (workDir !== Contstraints.Undefined) {
+        coreExports.warning('Do not use `working-directory`. Please use `aderyn.toml` instead. Read here to find how - https://cyfrin.gitbook.io/cyfrin-docs/aderyn-vs-code/aderyn.toml-configuration');
+    }
     if (failOn === Contstraints.Undefined && warnOn === Contstraints.Undefined) {
         throw new Error('Received no input for action. Expected one of "fail-on", "warn-on"');
     }
@@ -27302,12 +27306,13 @@ async function installAderyn() {
     await execExports.exec('npm install -g @cyfrin/aderyn@0.5'); // Max verison allowed for v0 is going to be 0.5.X aderyn
 }
 // Step 3
-async function getReport() {
+async function getReport(rworkDir) {
+    const cwd = rworkDir !== Contstraints.Undefined ? rworkDir : '.';
     const r = Math.round(Math.random() * 100000).toString();
     const mdReportName = `aderyn-report-${r}.md`;
     const jsonReportName = `aderyn-report-${r}.json`;
-    await execExports.exec(`aderyn -o ${mdReportName}`);
-    await execExports.exec(`aderyn -o ${jsonReportName}`);
+    await execExports.exec(`aderyn ${cwd} -o ${mdReportName}`);
+    await execExports.exec(`aderyn ${cwd} -o ${jsonReportName}`);
     const parsed = JSON.parse(require$$1.readFileSync(jsonReportName, 'utf8'));
     const markdown = require$$1.readFileSync(mdReportName, 'utf8');
     const report = {
