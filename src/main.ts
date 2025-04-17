@@ -6,10 +6,11 @@ import { rmRF } from '@actions/io'
 export async function run(): Promise<void> {
   try {
     // Gather Input
-    const failOn: string = core.getInput('fail-on')
-    const warnOn: string = core.getInput('warn-on')
-    const workDir: string = core.getInput('working-directory')
-    const input: Input = { failOn, warnOn, workDir }
+    const input: Input = {
+      failOn: core.getInput('fail-on'),
+      warnOn: core.getInput('warn-on'),
+      workDir: core.getInput('working-directory')
+    }
 
     // Step 1: Validate input
     ensureInputConstraints(input)
@@ -18,7 +19,7 @@ export async function run(): Promise<void> {
     await installAderyn()
 
     // Step 3: Run aderyn on the repository
-    const report = await getReport(workDir)
+    const report = await getReport(input.workDir)
 
     // Step 4: Act on report
     await actOnReportForGivenInput(input, report)
@@ -126,6 +127,7 @@ async function actOnReportForGivenInput(input: Input, report: Report) {
 
   core.info('Markdown report by running aderyn')
   core.info(report.mdContent)
+  core.info('Summary')
 
   if (report.high === 0 && report.low === 0) {
     core.info('No issues found!')

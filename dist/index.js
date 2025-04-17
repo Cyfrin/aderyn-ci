@@ -27254,16 +27254,17 @@ var ioExports = requireIo();
 async function run() {
     try {
         // Gather Input
-        const failOn = coreExports.getInput('fail-on');
-        const warnOn = coreExports.getInput('warn-on');
-        const workDir = coreExports.getInput('working-directory');
-        const input = { failOn, warnOn, workDir };
+        const input = {
+            failOn: coreExports.getInput('fail-on'),
+            warnOn: coreExports.getInput('warn-on'),
+            workDir: coreExports.getInput('working-directory')
+        };
         // Step 1: Validate input
         ensureInputConstraints(input);
         // Step 2: Install Aderyn
         await installAderyn();
         // Step 3: Run aderyn on the repository
-        const report = await getReport(workDir);
+        const report = await getReport(input.workDir);
         // Step 4: Act on report
         await actOnReportForGivenInput(input, report);
     }
@@ -27339,6 +27340,7 @@ async function actOnReportForGivenInput(input, report) {
     };
     coreExports.info('Markdown report by running aderyn');
     coreExports.info(report.mdContent);
+    coreExports.info('Summary');
     if (report.high === 0 && report.low === 0) {
         coreExports.info('No issues found!');
     }
