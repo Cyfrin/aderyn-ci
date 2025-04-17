@@ -21,7 +21,10 @@ export async function run(): Promise<void> {
     // Step 3: Run aderyn on the repository
     const report = await getReport(input.workDir)
 
-    // Step 4: Act on report
+    // Step 4: Print summary
+    printSummary(report)
+
+    // Step 5: Act on report
     await actOnReportForGivenInput(input, report)
   } catch (error) {
     // Fail the workflow run if an error occurs
@@ -32,6 +35,7 @@ export async function run(): Promise<void> {
 // Types
 enum Contstraints {
   High = 'high',
+  Low = 'low',
   Any = 'any',
   Undefined = ''
 }
@@ -64,11 +68,18 @@ function ensureInputConstraints(input: Input) {
     )
   }
 
+  if (failOn.includes(',') || warnOn.includes(',')) {
+    throw new Error(
+      'No "," allowed. Hint: Use "any" to include high and low issues'
+    )
+  }
+
   const passesConstraintsCheck = (argument: string): boolean => {
     return (
       argument === Contstraints.Undefined ||
       argument === Contstraints.Any ||
-      argument === Contstraints.High
+      argument === Contstraints.High ||
+      argument === Contstraints.Low
     )
   }
   if (!passesConstraintsCheck(failOn)) {
@@ -92,8 +103,14 @@ async function getReport(rworkDir: string): Promise<Report> {
   const mdReportName = `aderyn-report-${r}.md`
   const jsonReportName = `aderyn-report-${r}.json`
 
-  await exec.exec(`aderyn ${cwd} -o ${mdReportName} --no-snippets`)
-  await exec.exec(`aderyn ${cwd} -o ${jsonReportName}`, [], { silent: true })
+  await exec.exec(
+    `aderyn ${cwd} -o ${mdReportName} --no-snippets --skip-update-check`
+  )
+  await exec.exec(
+    `aderyn ${cwd} -o ${jsonReportName} --skip-update-check`,
+    [],
+    { silent: true }
+  )
 
   const parsed = JSON.parse(fs.readFileSync(jsonReportName, 'utf8'))
   const markdown = fs.readFileSync(mdReportName, 'utf8')
@@ -111,22 +128,8 @@ async function getReport(rworkDir: string): Promise<Report> {
 }
 
 // Step 4
-async function actOnReportForGivenInput(input: Input, report: Report) {
-  const { failOn, warnOn } = input
-
-  const createMessage = (): string => {
-    let message
-    message = `Issues found. Install and run aderyn locally to browse comfortably\n`
-    message += `1. VSCode extension - https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn\n`
-    message += `2. CLI - https://github.com/Cyfrin\n\n`
-    message += `Take any of the following action:\n`
-    message += `1. Fix the issues reported\n`
-    message += `2. Nudge Aderyn to ignore these issues. Instructions at https://cyfrin.gitbook.io/cyfrin-docs/directives-to-ignore-specific-lines\n`
-    return message
-  }
-
+function printSummary(report: Report) {
   core.info('Markdown report by running aderyn')
-  core.info(report.mdContent)
   core.info('Summary')
 
   if (report.high === 0 && report.low === 0) {
@@ -144,9 +147,31 @@ async function actOnReportForGivenInput(input: Input, report: Report) {
   } else if (report.low !== 0) {
     core.info(`${report.low} Low issues found!`)
   }
+}
 
+// Step 5
+async function actOnReportForGivenInput(input: Input, report: Report) {
+  const { failOn, warnOn } = input
+
+  const createMessage = (): string => {
+    let message
+    message = `Issues found. Install and run aderyn locally to browse comfortably\n`
+    message += `1. VSCode extension - https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn\n`
+    message += `2. CLI - https://github.com/Cyfrin\n\n`
+    message += `Take any of the following action:\n`
+    message += `1. Fix the issues reported\n`
+    message += `2. Nudge Aderyn to ignore these issues. Instructions at https://cyfrin.gitbook.io/cyfrin-docs/directives-to-ignore-specific-lines\n`
+    return message
+  }
+
+  // Fulfill failOn
   if (failOn === Contstraints.High) {
     if (report.high !== 0) {
+      core.info('\n')
+      core.setFailed(createMessage())
+    }
+  } else if (failOn === Contstraints.Low) {
+    if (report.low !== 0) {
       core.info('\n')
       core.setFailed(createMessage())
     }
@@ -155,8 +180,16 @@ async function actOnReportForGivenInput(input: Input, report: Report) {
       core.info('\n')
       core.setFailed(createMessage())
     }
-  } else if (warnOn === Contstraints.High) {
+  }
+
+  // Fulfill warnOn
+  if (warnOn === Contstraints.High) {
     if (report.high !== 0) {
+      core.info('\n')
+      core.warning(createMessage())
+    }
+  } else if (warnOn === Contstraints.Low) {
+    if (report.low !== 0) {
       core.info('\n')
       core.warning(createMessage())
     }

@@ -27265,7 +27265,9 @@ async function run() {
         await installAderyn();
         // Step 3: Run aderyn on the repository
         const report = await getReport(input.workDir);
-        // Step 4: Act on report
+        // Step 4: Print summary
+        printSummary(report);
+        // Step 5: Act on report
         await actOnReportForGivenInput(input, report);
     }
     catch (error) {
@@ -27278,6 +27280,7 @@ async function run() {
 var Contstraints;
 (function (Contstraints) {
     Contstraints["High"] = "high";
+    Contstraints["Low"] = "low";
     Contstraints["Any"] = "any";
     Contstraints["Undefined"] = "";
 })(Contstraints || (Contstraints = {}));
@@ -27290,10 +27293,14 @@ function ensureInputConstraints(input) {
     if (failOn === Contstraints.Undefined && warnOn === Contstraints.Undefined) {
         throw new Error('Received no input for action. Expected one of "fail-on", "warn-on"');
     }
+    if (failOn.includes(',') || warnOn.includes(',')) {
+        throw new Error('No "," allowed. Hint: Use "any" to include high and low issues');
+    }
     const passesConstraintsCheck = (argument) => {
         return (argument === Contstraints.Undefined ||
             argument === Contstraints.Any ||
-            argument === Contstraints.High);
+            argument === Contstraints.High ||
+            argument === Contstraints.Low);
     };
     if (!passesConstraintsCheck(failOn)) {
         throw new Error(`given fail-on: ${failOn}. Expected one of "high", "any"`);
@@ -27312,8 +27319,8 @@ async function getReport(rworkDir) {
     const r = Math.round(Math.random() * 100000).toString();
     const mdReportName = `aderyn-report-${r}.md`;
     const jsonReportName = `aderyn-report-${r}.json`;
-    await execExports.exec(`aderyn ${cwd} -o ${mdReportName} --no-snippets`);
-    await execExports.exec(`aderyn ${cwd} -o ${jsonReportName}`, [], { silent: true });
+    await execExports.exec(`aderyn ${cwd} -o ${mdReportName} --no-snippets --skip-update-check`);
+    await execExports.exec(`aderyn ${cwd} -o ${jsonReportName} --skip-update-check`, [], { silent: true });
     const parsed = JSON.parse(require$$1.readFileSync(jsonReportName, 'utf8'));
     const markdown = require$$1.readFileSync(mdReportName, 'utf8');
     const report = {
@@ -27326,20 +27333,8 @@ async function getReport(rworkDir) {
     return report;
 }
 // Step 4
-async function actOnReportForGivenInput(input, report) {
-    const { failOn, warnOn } = input;
-    const createMessage = () => {
-        let message;
-        message = `Issues found. Install and run aderyn locally to browse comfortably\n`;
-        message += `1. VSCode extension - https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn\n`;
-        message += `2. CLI - https://github.com/Cyfrin\n\n`;
-        message += `Take any of the following action:\n`;
-        message += `1. Fix the issues reported\n`;
-        message += `2. Nudge Aderyn to ignore these issues. Instructions at https://cyfrin.gitbook.io/cyfrin-docs/directives-to-ignore-specific-lines\n`;
-        return message;
-    };
+function printSummary(report) {
     coreExports.info('Markdown report by running aderyn');
-    coreExports.info(report.mdContent);
     coreExports.info('Summary');
     if (report.high === 0 && report.low === 0) {
         coreExports.info('No issues found!');
@@ -27359,8 +27354,29 @@ async function actOnReportForGivenInput(input, report) {
     else if (report.low !== 0) {
         coreExports.info(`${report.low} Low issues found!`);
     }
+}
+// Step 5
+async function actOnReportForGivenInput(input, report) {
+    const { failOn, warnOn } = input;
+    const createMessage = () => {
+        let message;
+        message = `Issues found. Install and run aderyn locally to browse comfortably\n`;
+        message += `1. VSCode extension - https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn\n`;
+        message += `2. CLI - https://github.com/Cyfrin\n\n`;
+        message += `Take any of the following action:\n`;
+        message += `1. Fix the issues reported\n`;
+        message += `2. Nudge Aderyn to ignore these issues. Instructions at https://cyfrin.gitbook.io/cyfrin-docs/directives-to-ignore-specific-lines\n`;
+        return message;
+    };
+    // Fulfill failOn
     if (failOn === Contstraints.High) {
         if (report.high !== 0) {
+            coreExports.info('\n');
+            coreExports.setFailed(createMessage());
+        }
+    }
+    else if (failOn === Contstraints.Low) {
+        if (report.low !== 0) {
             coreExports.info('\n');
             coreExports.setFailed(createMessage());
         }
@@ -27371,8 +27387,15 @@ async function actOnReportForGivenInput(input, report) {
             coreExports.setFailed(createMessage());
         }
     }
-    else if (warnOn === Contstraints.High) {
+    // Fulfill warnOn
+    if (warnOn === Contstraints.High) {
         if (report.high !== 0) {
+            coreExports.info('\n');
+            coreExports.warning(createMessage());
+        }
+    }
+    else if (warnOn === Contstraints.Low) {
+        if (report.low !== 0) {
             coreExports.info('\n');
             coreExports.warning(createMessage());
         }
