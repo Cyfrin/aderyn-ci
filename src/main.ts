@@ -85,14 +85,14 @@ async function installAderyn() {
 
 // Step 3
 async function getReport(rworkDir: string): Promise<Report> {
-  const cwd = rworkDir !== Contstraints.Undefined ? rworkDir : undefined
+  const cwd = rworkDir !== Contstraints.Undefined ? rworkDir : '.'
 
   const r = Math.round(Math.random() * 100000).toString()
   const mdReportName = `aderyn-report-${r}.md`
   const jsonReportName = `aderyn-report-${r}.json`
 
-  await exec.exec(`aderyn -o ${mdReportName}`, [], { cwd })
-  await exec.exec(`aderyn -o ${jsonReportName}`, [], { cwd })
+  await exec.exec(`aderyn ${cwd} -o ${mdReportName}`)
+  await exec.exec(`aderyn ${cwd} -o ${jsonReportName}`)
 
   const parsed = JSON.parse(fs.readFileSync(jsonReportName, 'utf8'))
   const markdown = fs.readFileSync(mdReportName, 'utf8')
