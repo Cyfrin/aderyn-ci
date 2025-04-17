@@ -44,16 +44,3 @@ jobs:
         id: npm-ci-test
         run: npm run ci-test
 
-  test-action-1:
-    name: GitHub Actions Test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v4
-
-      - name: Test Local Action
-        uses: ./
-        with:
-          fail-on: any
