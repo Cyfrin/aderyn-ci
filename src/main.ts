@@ -53,7 +53,7 @@ function ensureInputConstraints(input: Input) {
 
   if (workDir !== Contstraints.Undefined) {
     core.warning(
-      'Do not use `working-directory`. Please use `aderyn.toml` instead. Read here to find how - https://cyfrin.gitbook.io/cyfrin-docs/aderyn-vs-code/aderyn.toml-configuration'
+      'Do not use `working-directory`. Please configure the root in `aderyn.toml` instead. Read here to find how - https://cyfrin.gitbook.io/cyfrin-docs/aderyn-vs-code/aderyn.toml-configuration'
     )
   }
 

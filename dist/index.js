@@ -27284,7 +27284,7 @@ var Contstraints;
 function ensureInputConstraints(input) {
     const { failOn, warnOn, workDir } = input;
     if (workDir !== Contstraints.Undefined) {
-        coreExports.warning('Do not use `working-directory`. Please use `aderyn.toml` instead. Read here to find how - https://cyfrin.gitbook.io/cyfrin-docs/aderyn-vs-code/aderyn.toml-configuration');
+        coreExports.warning('Do not use `working-directory`. Please configure the root in `aderyn.toml` instead. Read here to find how - https://cyfrin.gitbook.io/cyfrin-docs/aderyn-vs-code/aderyn.toml-configuration');
     }
     if (failOn === Contstraints.Undefined && warnOn === Contstraints.Undefined) {
         throw new Error('Received no input for action. Expected one of "fail-on", "warn-on"');
