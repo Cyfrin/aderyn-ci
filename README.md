@@ -25,7 +25,7 @@ The main project that powers this is [Adeyrn](https://github.com/Cyfrin/aderyn).
 
 ```yml
 - name: Aderyn Check
-  uses: @Cyfrin/aderyn-ci
+  uses: @Cyfrin/aderyn-ci@v0
   with:
     fail-on: high
 ```
@@ -65,7 +65,7 @@ jobs:
         run: forge test -vvv
 
       - name: Aderyn Check
-        uses: @Cyfrin/aderyn-ci
+        uses: @Cyfrin/aderyn-ci@v0
         with:
           fail-on: high
 ```
