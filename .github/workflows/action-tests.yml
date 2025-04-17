@@ -44,7 +44,6 @@ jobs:
         with:
           fail-on: high
 
-
   test-foundry-any-warning:
     name: GitHub Actions Test
     runs-on: ubuntu-latest
