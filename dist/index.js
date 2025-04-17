@@ -27312,7 +27312,7 @@ async function getReport(rworkDir) {
     const mdReportName = `aderyn-report-${r}.md`;
     const jsonReportName = `aderyn-report-${r}.json`;
     await execExports.exec(`aderyn ${cwd} -o ${mdReportName} --no-snippets`);
-    await execExports.exec(`aderyn ${cwd} -o ${jsonReportName}`);
+    await execExports.exec(`aderyn ${cwd} -o ${jsonReportName}`, [], { silent: true });
     const parsed = JSON.parse(require$$1.readFileSync(jsonReportName, 'utf8'));
     const markdown = require$$1.readFileSync(mdReportName, 'utf8');
     const report = {
