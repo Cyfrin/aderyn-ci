@@ -53,3 +53,38 @@ jobs:
         with:
           working-directory: ./test-contracts/hello_foundry
           fail-on: high
+
+  test-foundry-any-warn:
+    name: Actions Test - Foundry-warn-Any
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Test Local Action
+        uses: ./
+        id: custom
+        with:
+          working-directory: ./test-contracts/hello_foundry
+          warn-on: any
+
+  test-foundry-high-warn:
+    name: Actions Test - Foundry-warn-High
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Test Local Action
+        uses: ./
+        with:
+          working-directory: ./test-contracts/hello_foundry
+          warn-on: high
