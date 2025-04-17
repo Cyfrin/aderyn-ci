@@ -27311,7 +27311,7 @@ async function getReport(rworkDir) {
     const r = Math.round(Math.random() * 100000).toString();
     const mdReportName = `aderyn-report-${r}.md`;
     const jsonReportName = `aderyn-report-${r}.json`;
-    await execExports.exec(`aderyn ${cwd} -o ${mdReportName}`);
+    await execExports.exec(`aderyn ${cwd} -o ${mdReportName} --no-snippets`);
     await execExports.exec(`aderyn ${cwd} -o ${jsonReportName}`);
     const parsed = JSON.parse(require$$1.readFileSync(jsonReportName, 'utf8'));
     const markdown = require$$1.readFileSync(mdReportName, 'utf8');
@@ -27330,7 +27330,10 @@ async function actOnReportForGivenInput(input, report) {
     coreExports.debug('Markdown report by running aderyn');
     coreExports.debug(report.mdContent);
     const createMessage = (category) => {
-        let message = `${category} issues found. To see the issues, run "aderyn" in the workspace root of the project.\n`;
+        let message = `\n\n${category} issues found. Install and run aderyn locally to see more\n\n`;
+        message += `To install and use Aderyn locally, use either of the methods enlisted:\n`;
+        message += `1. VSCode extension - https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn\n`;
+        message += `2. CLI - https://github.com/Cyfrin\n\n`;
         message += `Take any of the following action:\n`;
         message += `1. Fix the issue reported\n`;
         message += `2. Nudge Aderyn to ignore these issues. Instructions at https://cyfrin.gitbook.io/cyfrin-docs/directives-to-ignore-specific-lines\n`;
