@@ -24,6 +24,8 @@ jobs:
         with:
           working-directory: ./test-contracts/hello_foundry
           fail-on: any
+
+      - name: Fail check
         if: failure()
         run: |
           echo "Test failed, forcing pass"
