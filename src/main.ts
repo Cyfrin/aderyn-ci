@@ -92,7 +92,7 @@ async function getReport(rworkDir: string): Promise<Report> {
   const jsonReportName = `aderyn-report-${r}.json`
 
   await exec.exec(`aderyn ${cwd} -o ${mdReportName} --no-snippets`)
-  await exec.exec(`aderyn ${cwd} -o ${jsonReportName}`)
+  await exec.exec(`aderyn ${cwd} -o ${jsonReportName}`, [], { silent: true })
 
   const parsed = JSON.parse(fs.readFileSync(jsonReportName, 'utf8'))
   const markdown = fs.readFileSync(mdReportName, 'utf8')
