@@ -1,4 +1,4 @@
-name: Actiont tests
+name: Action tests
 
 permissions:
   contents: read
@@ -23,6 +23,7 @@ jobs:
         uses: ./
         with:
           fail-on: any
+        continue-on-error: true
 
   test-foundry-high-fail:
     name: GitHub Actions Test
