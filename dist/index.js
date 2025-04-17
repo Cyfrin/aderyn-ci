@@ -27327,8 +27327,6 @@ async function getReport(rworkDir) {
 // Step 4
 async function actOnReportForGivenInput(input, report) {
     const { failOn, warnOn } = input;
-    coreExports.debug('Markdown report by running aderyn');
-    coreExports.debug(report.mdContent);
     const createMessage = (category) => {
         let message = `${category} issues found. Install and run aderyn locally to see more\n`;
         message += `1. VSCode extension - https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn\n`;
@@ -27340,24 +27338,33 @@ async function actOnReportForGivenInput(input, report) {
     };
     if (failOn === Contstraints.High) {
         if (report.high !== 0) {
+            coreExports.info('Markdown report by running aderyn');
+            coreExports.info(report.mdContent);
             coreExports.info('\n\n');
             coreExports.setFailed(createMessage('High'));
         }
     }
     else if (failOn === Contstraints.Any) {
         if (report.high !== 0 || report.low !== 0) {
+            coreExports.info('Markdown report by running aderyn');
+            coreExports.info(report.mdContent);
             coreExports.info('\n\n');
             coreExports.setFailed(createMessage('Some'));
         }
     }
     else if (warnOn === Contstraints.High) {
         if (report.high !== 0) {
+            coreExports.info('Markdown report by running aderyn');
+            coreExports.info(report.mdContent);
             coreExports.info('\n\n');
             coreExports.warning(createMessage('High'));
         }
     }
     else if (warnOn === Contstraints.Any) {
         if (report.high !== 0 || report.low !== 0) {
+            coreExports.info('Markdown report by running aderyn');
+            coreExports.info(report.mdContent);
+            coreExports.info('\n\n');
             coreExports.warning(createMessage('Some'));
         }
     }

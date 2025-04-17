@@ -113,9 +113,6 @@ async function getReport(rworkDir: string): Promise<Report> {
 async function actOnReportForGivenInput(input: Input, report: Report) {
   const { failOn, warnOn } = input
 
-  core.debug('Markdown report by running aderyn')
-  core.debug(report.mdContent)
-
   const createMessage = (category: string): string => {
     let message = `${category} issues found. Install and run aderyn locally to see more\n`
     message += `1. VSCode extension - https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn\n`
@@ -128,21 +125,30 @@ async function actOnReportForGivenInput(input: Input, report: Report) {
 
   if (failOn === Contstraints.High) {
     if (report.high !== 0) {
+      core.info('Markdown report by running aderyn')
+      core.info(report.mdContent)
       core.info('\n\n')
       core.setFailed(createMessage('High'))
     }
   } else if (failOn === Contstraints.Any) {
     if (report.high !== 0 || report.low !== 0) {
+      core.info('Markdown report by running aderyn')
+      core.info(report.mdContent)
       core.info('\n\n')
       core.setFailed(createMessage('Some'))
     }
   } else if (warnOn === Contstraints.High) {
     if (report.high !== 0) {
+      core.info('Markdown report by running aderyn')
+      core.info(report.mdContent)
       core.info('\n\n')
       core.warning(createMessage('High'))
     }
   } else if (warnOn === Contstraints.Any) {
     if (report.high !== 0 || report.low !== 0) {
+      core.info('Markdown report by running aderyn')
+      core.info(report.mdContent)
+      core.info('\n\n')
       core.warning(createMessage('Some'))
     }
   }
