@@ -1,3 +1,3 @@
-[submodule "test-contracts/hello-world/lib/forge-std"]
-	path = test-contracts/hello-world/lib/forge-std
+[submodule "test-contracts/hello_foundry/lib/forge-std"]
+	path = test-contracts/hello_foundry/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
