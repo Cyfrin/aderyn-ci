@@ -155,7 +155,7 @@ async function actOnReportForGivenInput(input: Input, report: Report) {
 
   const createMessage = (): string => {
     let message
-    message = `Issues found. Install and run aderyn locally to browse comfortably\n`
+    message = `Issues found. Install and run aderyn locally to view the issues in detail\n`
     message += `1. VSCode extension - https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn\n`
     message += `2. CLI - https://github.com/Cyfrin\n\n`
     message += `Take any of the following action:\n`
