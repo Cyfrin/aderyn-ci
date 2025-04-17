@@ -123,31 +123,34 @@ async function actOnReportForGivenInput(input: Input, report: Report) {
     return message
   }
 
+  core.info('Markdown report by running aderyn')
+  core.info(report.mdContent)
+
+  if (report.high === 0 && report.low === 0) {
+    core.info('No issues found!')
+  } else if (report.high === 0) {
+    core.info('No high issues found!')
+  } else if (report.low === 0) {
+    core.info('No low issues found!')
+  }
+
   if (failOn === Contstraints.High) {
     if (report.high !== 0) {
-      core.info('Markdown report by running aderyn')
-      core.info(report.mdContent)
       core.info('\n\n')
       core.setFailed(createMessage('High'))
     }
   } else if (failOn === Contstraints.Any) {
     if (report.high !== 0 || report.low !== 0) {
-      core.info('Markdown report by running aderyn')
-      core.info(report.mdContent)
       core.info('\n\n')
       core.setFailed(createMessage('Some'))
     }
   } else if (warnOn === Contstraints.High) {
     if (report.high !== 0) {
-      core.info('Markdown report by running aderyn')
-      core.info(report.mdContent)
       core.info('\n\n')
       core.warning(createMessage('High'))
     }
   } else if (warnOn === Contstraints.Any) {
     if (report.high !== 0 || report.low !== 0) {
-      core.info('Markdown report by running aderyn')
-      core.info(report.mdContent)
       core.info('\n\n')
       core.warning(createMessage('Some'))
     }

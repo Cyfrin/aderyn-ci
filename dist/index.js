@@ -27336,34 +27336,37 @@ async function actOnReportForGivenInput(input, report) {
         message += `2. Nudge Aderyn to ignore these issues. Instructions at https://cyfrin.gitbook.io/cyfrin-docs/directives-to-ignore-specific-lines\n`;
         return message;
     };
+    coreExports.info('Markdown report by running aderyn');
+    coreExports.info(report.mdContent);
+    if (report.high === 0 && report.low === 0) {
+        coreExports.info('No issues found!');
+    }
+    else if (report.high === 0) {
+        coreExports.info('No high issues found!');
+    }
+    else if (report.low === 0) {
+        coreExports.info('No low issues found!');
+    }
     if (failOn === Contstraints.High) {
         if (report.high !== 0) {
-            coreExports.info('Markdown report by running aderyn');
-            coreExports.info(report.mdContent);
             coreExports.info('\n\n');
             coreExports.setFailed(createMessage('High'));
         }
     }
     else if (failOn === Contstraints.Any) {
         if (report.high !== 0 || report.low !== 0) {
-            coreExports.info('Markdown report by running aderyn');
-            coreExports.info(report.mdContent);
             coreExports.info('\n\n');
             coreExports.setFailed(createMessage('Some'));
         }
     }
     else if (warnOn === Contstraints.High) {
         if (report.high !== 0) {
-            coreExports.info('Markdown report by running aderyn');
-            coreExports.info(report.mdContent);
             coreExports.info('\n\n');
             coreExports.warning(createMessage('High'));
         }
     }
     else if (warnOn === Contstraints.Any) {
         if (report.high !== 0 || report.low !== 0) {
-            coreExports.info('Markdown report by running aderyn');
-            coreExports.info(report.mdContent);
             coreExports.info('\n\n');
             coreExports.warning(createMessage('Some'));
         }
