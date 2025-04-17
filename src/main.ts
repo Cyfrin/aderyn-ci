@@ -91,7 +91,7 @@ async function getReport(rworkDir: string): Promise<Report> {
   const mdReportName = `aderyn-report-${r}.md`
   const jsonReportName = `aderyn-report-${r}.json`
 
-  await exec.exec(`aderyn ${cwd} -o ${mdReportName} --highs-only`)
+  await exec.exec(`aderyn ${cwd} -o ${mdReportName} --no-snippets`)
   await exec.exec(`aderyn ${cwd} -o ${jsonReportName}`)
 
   const parsed = JSON.parse(fs.readFileSync(jsonReportName, 'utf8'))
@@ -117,7 +117,10 @@ async function actOnReportForGivenInput(input: Input, report: Report) {
   core.debug(report.mdContent)
 
   const createMessage = (category: string): string => {
-    let message = `${category} issues found. To see the issues, run "aderyn" in the workspace root of the project.\n`
+    let message = `\n\n${category} issues found. Install and run aderyn locally to see more\n\n`
+    message += `To install and use Aderyn locally, use either of the methods enlisted:\n`
+    message += `1. VSCode extension - https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn\n`
+    message += `2. CLI - https://github.com/Cyfrin\n\n`
     message += `Take any of the following action:\n`
     message += `1. Fix the issue reported\n`
     message += `2. Nudge Aderyn to ignore these issues. Instructions at https://cyfrin.gitbook.io/cyfrin-docs/directives-to-ignore-specific-lines\n`
