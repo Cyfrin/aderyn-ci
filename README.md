@@ -1,8 +1,5 @@
 # Aderyn - Continuous Integration
 
-> [!CAUTION]
->  Aderyn CI is under active development and is undergoing Alpha testing.
-
 ## About
 
 Peforms Static analysis on Solidity codebases in CI to catch potential vulnerabilities before committing code.
