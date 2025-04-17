@@ -35,8 +35,8 @@ enum Contstraints {
 }
 
 interface Report {
-  high: Number
-  low: Number
+  high: number
+  low: number
   mdContent: string
 }
 
