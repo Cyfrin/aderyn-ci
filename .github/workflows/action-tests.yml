@@ -20,9 +20,9 @@ jobs:
           submodules: recursive
 
       - name: Test Local Action
-        working-directory: ./test-contracts/hello_foundry
         uses: ./
         with:
+          working-directory: ./test-contracts/hello_foundry
           fail-on: any
         continue-on-error: true
 
