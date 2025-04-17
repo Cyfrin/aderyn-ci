@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   test-foundry-any-fail:
-    name: Actions Test - Foundry-Fail-Any
+    name: Actions Test - Foundry-fail-Any
     runs-on: ubuntu-latest
 
     steps:
@@ -38,7 +38,7 @@ jobs:
           exit 1
 
   test-foundry-high-fail:
-    name: Actions Test - Foundry-Fail-High
+    name: Actions Test - Foundry-fail-High
     runs-on: ubuntu-latest
 
     steps:
