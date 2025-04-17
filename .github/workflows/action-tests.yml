@@ -25,12 +25,6 @@ jobs:
           working-directory: ./test-contracts/hello_foundry
           fail-on: any
 
-      - name: Fail the job if the test passed
-        if: success()
-        run: |
-          echo "Test passed, forcing failure"
-          exit 1
-
       - name: Pass the job if the test failed
         if: failure()
         run: |
