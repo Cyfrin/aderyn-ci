@@ -1,7 +1,7 @@
 # Aderyn - Continuous Integration
 
 > [!CAUTION]
->  Aderyn CI is under active development and is not guaranteed to work
+>  Aderyn CI is under active development and is undergoing Alpha testing.
 
 To test your project using GitHub Actions, here is a sample workflow for a Foundry project:
 
