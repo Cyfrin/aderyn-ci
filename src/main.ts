@@ -113,12 +113,13 @@ async function getReport(rworkDir: string): Promise<Report> {
 async function actOnReportForGivenInput(input: Input, report: Report) {
   const { failOn, warnOn } = input
 
-  const createMessage = (category: string): string => {
-    let message = `${category} issues found. Install and run aderyn locally to see more\n`
+  const createMessage = (): string => {
+    let message
+    message = `Install and run aderyn locally to see more\n`
     message += `1. VSCode extension - https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn\n`
     message += `2. CLI - https://github.com/Cyfrin\n\n`
     message += `Take any of the following action:\n`
-    message += `1. Fix the issue reported\n`
+    message += `1. Fix the issues reported\n`
     message += `2. Nudge Aderyn to ignore these issues. Instructions at https://cyfrin.gitbook.io/cyfrin-docs/directives-to-ignore-specific-lines\n`
     return message
   }
@@ -134,25 +135,33 @@ async function actOnReportForGivenInput(input: Input, report: Report) {
     core.info('No low issues found!')
   }
 
+  if (report.high !== 0 && report.low !== 0) {
+    core.info('High and low issues found!')
+  } else if (report.high !== 0) {
+    core.info('High issues found!')
+  } else if (report.low !== 0) {
+    core.info('Low issues found!')
+  }
+
   if (failOn === Contstraints.High) {
     if (report.high !== 0) {
-      core.info('\n\n')
-      core.setFailed(createMessage('High'))
+      core.info('\n')
+      core.setFailed(createMessage())
     }
   } else if (failOn === Contstraints.Any) {
     if (report.high !== 0 || report.low !== 0) {
-      core.info('\n\n')
-      core.setFailed(createMessage('Some'))
+      core.info('\n')
+      core.setFailed(createMessage())
     }
   } else if (warnOn === Contstraints.High) {
     if (report.high !== 0) {
-      core.info('\n\n')
-      core.warning(createMessage('High'))
+      core.info('\n')
+      core.warning(createMessage())
     }
   } else if (warnOn === Contstraints.Any) {
     if (report.high !== 0 || report.low !== 0) {
-      core.info('\n\n')
-      core.warning(createMessage('Some'))
+      core.info('\n')
+      core.warning(createMessage())
     }
   }
 }
