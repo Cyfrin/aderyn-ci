@@ -21,15 +21,21 @@ jobs:
 
       - name: Test Local Action
         uses: ./
+        id: custom
         with:
           working-directory: ./test-contracts/hello_foundry
           fail-on: any
+        continue-on-error: true
 
-      - name: Fail check
-        if: failure()
+      - name: Assert that it failed
+        if: steps.custom.outcome == 'failure'
+        run: echo "✅ Correctly failed."
+
+      - name: Fail if it succeeded
+        if: steps.custom.outcome != 'failure'
         run: |
-          echo "Test failed, forcing pass"
-          exit 0
+          echo "❌ Action unexpectedly succeeded."
+          exit 1
 
   test-foundry-high-fail:
     name: Actions Test - Foundry-Fail-High
