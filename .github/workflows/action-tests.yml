@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   test-foundry-any-fail:
-    name: GitHub Actions Test
+    name: Actions Test - Foundry-Fail-Any
     runs-on: ubuntu-latest
 
     steps:
@@ -24,10 +24,9 @@ jobs:
         with:
           working-directory: ./test-contracts/hello_foundry
           fail-on: any
-        continue-on-error: true
 
   test-foundry-high-fail:
-    name: GitHub Actions Test
+    name: Actions Test - Foundry-Fail-High
     runs-on: ubuntu-latest
 
     steps:
