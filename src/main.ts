@@ -140,9 +140,9 @@ async function actOnReportForGivenInput(input: Input, report: Report) {
   if (report.high !== 0 && report.low !== 0) {
     core.info('High and low issues found!')
   } else if (report.high !== 0) {
-    core.info('High issues found!')
+    core.info(`${report.high} High issues found!`)
   } else if (report.low !== 0) {
-    core.info('Low issues found!')
+    core.info(`${report.low} Low issues found!`)
   }
 
   if (failOn === Contstraints.High) {

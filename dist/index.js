@@ -27354,10 +27354,10 @@ async function actOnReportForGivenInput(input, report) {
         coreExports.info('High and low issues found!');
     }
     else if (report.high !== 0) {
-        coreExports.info('High issues found!');
+        coreExports.info(`${report.high} High issues found!`);
     }
     else if (report.low !== 0) {
-        coreExports.info('Low issues found!');
+        coreExports.info(`${report.low} Low issues found!`);
     }
     if (failOn === Contstraints.High) {
         if (report.high !== 0) {
