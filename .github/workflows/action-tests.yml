@@ -24,7 +24,6 @@ jobs:
         with:
           working-directory: ./test-contracts/hello_foundry
           fail-on: any
-        continue-on-error: true
 
       - name: Fail the job if the test passed
         if: success()
