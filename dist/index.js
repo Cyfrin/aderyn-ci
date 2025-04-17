@@ -27360,7 +27360,7 @@ async function actOnReportForGivenInput(input, report) {
     const { failOn, warnOn } = input;
     const createMessage = () => {
         let message = '';
-        message += `${report.high === 0 ? 'No' : report.high} high and ${report.low === 0 ? 'no' : report.low} low issues were found.\n`;
+        message += `${report.high === 0 ? 'No' : report.high} high issues were found and ${report.low === 0 ? 'no' : report.low} low issues were found.\n`;
         message += `Install and run aderyn locally to view the issues in detail\n`;
         message += `1. VSCode extension - https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn\n`;
         message += `2. CLI - https://github.com/Cyfrin\n\n`;
