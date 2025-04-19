@@ -8,7 +8,7 @@ The main project that powers this is [Adeyrn](https://github.com/Cyfrin/aderyn).
 ## Recommended workflow
 
 1. Install the officially supported [Aderyn VSCode Extension](https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn)
-2. Get comfortable with attending to the instant local feedback loop. (Either by fixing the issue or acknowledging to not fix it)
+2. Get comfortable with attending to the instant local feedback loop. (Acknowledge it either by fixing the issue or explicitly [ignoring](https://cyfrin.gitbook.io/cyfrin-docs/directives-to-ignore-specific-lines) it)
 3. Add the following to your CI to catch unacknowledged issues before merging PRs.
 
 ## How to use
