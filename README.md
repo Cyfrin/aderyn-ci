@@ -67,3 +67,10 @@ jobs:
           fail-on: high
 ```
 
+## Snapshot
+
+<img width="1345" alt="ci-assistant" src="https://github.com/user-attachments/assets/0d6bdfa0-ecb4-4a24-a86e-62a8399a77d0" />
+
+
+
+
