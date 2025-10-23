@@ -2,7 +2,7 @@
 
 ## About
 
-Peforms Static analysis on Solidity codebases in CI to catch potential vulnerabilities before committing code.
+Performs Static analysis on Solidity codebases in CI to catch potential vulnerabilities before committing code.
 The main project that powers this is [Adeyrn](https://github.com/Cyfrin/aderyn). Check it out for more information
 
 ## Recommended workflow
