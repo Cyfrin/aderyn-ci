@@ -27563,7 +27563,7 @@ function ensureInputConstraints(input) {
 }
 // Step 2
 async function installAderyn() {
-    await execExports.exec('npm install -g @cyfrin/aderyn@0.5'); // Max verison allowed for v0 is going to be 0.5.X aderyn
+    await execExports.exec('npm install -g @cyfrin/aderyn@0.6'); // Max verison allowed for v0 is going to be 0.5.X aderyn
 }
 // Step 3
 async function getReport(rworkDir) {
