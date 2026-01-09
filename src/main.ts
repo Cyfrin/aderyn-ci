@@ -92,7 +92,7 @@ function ensureInputConstraints(input: Input) {
 
 // Step 2
 async function installAderyn() {
-  await exec.exec('npm install -g @cyfrin/aderyn@0.5') // Max verison allowed for v0 is going to be 0.5.X aderyn
+  await exec.exec('npm install -g @cyfrin/aderyn@0.6') // Max verison allowed for v0 is going to be 0.6.X aderyn
 }
 
 // Step 3
