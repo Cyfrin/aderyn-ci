@@ -1,24 +1,34 @@
 # Aderyn - Continuous Integration
 
-## About
+> [!IMPORTANT]
+> Aderyn CI Assistant is retired and no longer maintained. Do not add this action
+> to new workflows. Aderyn's CLI release downloads have been withdrawn and its
+> npm package is retired, so existing runs that install Aderyn may fail.
 
-Performs Static analysis on Solidity codebases in CI to catch potential vulnerabilities before committing code.
-The main project that powers this is [Adeyrn](https://github.com/Cyfrin/aderyn). Check it out for more information
+## Existing workflows
 
-## Recommended workflow
+Remove or replace any workflow step that uses `Cyfrin/aderyn-ci`, including steps
+pinned to a version tag or commit SHA. Review the workflow's remaining checks so
+it no longer depends on Aderyn's results.
 
-1. Install the officially supported [Aderyn VSCode Extension](https://marketplace.visualstudio.com/items?itemName=Cyfrin.aderyn)
-2. Get comfortable with attending to the instant local feedback loop. (Acknowledge it either by fixing the issue or explicitly [ignoring](https://cyfrin.gitbook.io/cyfrin-docs/directives-to-ignore-specific-lines) it)
-3. Add the following to your CI to catch unacknowledged issues before merging PRs.
+Removing the GitHub Marketplace listing does not disable references to existing
+tags or commit SHAs, or remove this action from your workflows. Migrating those
+workflows is a separate task.
 
-## How to use
+## Historical usage
+
+The documentation below is retained to help identify and migrate existing
+configurations. It is not a supported installation guide.
+
+This action used [Aderyn](https://github.com/Cyfrin/aderyn) to perform static
+analysis on Solidity codebases in CI.
 
 ### Pre-requisites
 
 - Dependencies must be installed
 - Project must compile successfully
 
-### CI Step
+### Historical CI step
 
 ```yml
 - name: Aderyn Check
@@ -34,10 +44,7 @@ Available input variations:
 The former fails the CI step while latter only emits warnings that can be seen in the Actions summary.
 Both can take up the following values - `high`, `low` or `any`
 
-> [!NOTE]
-> Only Github is supported currently.
-
-## Example - Foundry Project
+## Historical example - Foundry Project
 
 ```yml
 on: [push]
@@ -67,7 +74,7 @@ jobs:
           fail-on: high
 ```
 
-## Snapshot
+## Historical snapshot
 
 <img width="1345" alt="ci-assistant" src="https://github.com/user-attachments/assets/0d6bdfa0-ecb4-4a24-a86e-62a8399a77d0" />
 
